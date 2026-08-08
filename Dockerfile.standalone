@@ -54,8 +54,8 @@ ENV SE_BROWSER_ARGS_DEV_SHM=${DEV_SHM_ARG}
 
 # --- Graphical debugging --------------------------------------------------
 # VNC + noVNC cost ~150 MB of RSS and expose an unauthenticated framebuffer on
-# 7900. Off by default; the README says which two variables turn them on when
-# a deployer wants to watch a run.
+# 7900. Off, and meant to stay off: a graphical session reachable from the
+# internet is a remote desktop, which is not what a Railway service is for.
 ENV SE_START_VNC=false \
     SE_START_NO_VNC=false
 

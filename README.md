@@ -35,6 +35,6 @@ Selenium **4.46.0** (`4.46.0-20260707`). Wrapper images for the Railway marketpl
 | `SE_ROUTER_PASSWORD` | — | **required**, generated per deploy by the template |
 | `SE_NODE_MAX_SESSIONS` | `2` | raise with the plan |
 | `SE_NODE_SESSION_TIMEOUT` | `300` | seconds |
-| `SE_START_VNC` / `SE_START_NO_VNC` | `false` | set both `true` to watch a run; noVNC listens on 7900 with no auth of its own |
+| `SE_START_VNC` / `SE_START_NO_VNC` | `false` | leave off. Railway is not a remote-desktop host, and noVNC has no authentication of its own |
 
 Connect a client to `https://selenium:<password>@<your-domain>/wd/hub`.
