@@ -20,6 +20,7 @@ jobs:
           - image: selenium-standalone-firefox-railway
             file: Dockerfile.standalone
             browser: firefox
+            dev_shm: "none"
           - image: selenium-standalone-edge-railway
             file: Dockerfile.standalone
             browser: edge
@@ -32,6 +33,7 @@ jobs:
           - image: selenium-node-firefox-railway
             file: Dockerfile.node
             browser: firefox
+            dev_shm: "none"
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -47,4 +49,5 @@ jobs:
           push: true
           build-args: |
             BROWSER=${{ matrix.browser }}
+            DEV_SHM_ARG=${{ matrix.dev_shm == 'none' && '' || '--disable-dev-shm-usage' }}
           tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:latest

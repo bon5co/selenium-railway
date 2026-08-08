@@ -17,7 +17,13 @@ ENV SE_NODE_MAX_SESSIONS=2 \
 
 # 64 MB of /dev/shm kills Chromium renderers mid-test and --shm-size is not a
 # knob a Railway deployer has.
-ENV SE_BROWSER_ARGS_DEV_SHM=--disable-dev-shm-usage
+# Chromium-family only: Firefox rejects the flag and geckodriver then refuses
+# every session with "Connection error (POST http://localhost:NNNN/session)",
+# which reads like a driver crash, not like a bad argument (measured against a
+# live deploy, 2026-08-08). The build passes an empty value for Firefox and the
+# entrypoint drops the variable rather than appending an empty argument.
+ARG DEV_SHM_ARG=--disable-dev-shm-usage
+ENV SE_BROWSER_ARGS_DEV_SHM=${DEV_SHM_ARG}
 
 # A node's registration port is its own, not Railway's injected $PORT: the hub
 # dials it back on the private network and there is no edge proxy in between.

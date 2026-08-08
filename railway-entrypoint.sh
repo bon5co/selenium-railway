@@ -10,6 +10,14 @@ set -e
 
 ROLE="${SE_RAILWAY_ROLE:-standalone}"
 
+# The Firefox builds set SE_BROWSER_ARGS_DEV_SHM to an empty string, because
+# --disable-dev-shm-usage is a Chromium flag and geckodriver refuses a session
+# that carries it. docker-selenium appends any SE_BROWSER_ARGS_* it finds, so
+# an empty one has to be removed rather than left blank.
+if [ -z "${SE_BROWSER_ARGS_DEV_SHM:-}" ]; then
+    unset SE_BROWSER_ARGS_DEV_SHM
+fi
+
 # ---------------------------------------------------------------------------
 # 1. Port
 # ---------------------------------------------------------------------------
