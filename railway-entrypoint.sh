@@ -40,14 +40,16 @@ fi
 # 2. Private networking is IPv6-only
 # ---------------------------------------------------------------------------
 # Railway's internal DNS (*.railway.internal) publishes AAAA records and no A
-# records. The JVM prefers IPv4 addresses by default, so a node resolving the
-# hub's private domain picks nothing and the grid never forms -- the node logs
-# reconnect attempts, the hub reports zero nodes, and every session request
-# 500s with "Unable to find provider for session". Preferring IPv6 and binding
-# the wildcard address is what makes hub<->node traffic work over the private
-# network at all.
-SE_JAVA_OPTS="${SE_JAVA_OPTS:-} -Djava.net.preferIPv6Addresses=true"
-export SE_JAVA_OPTS
+# records, so hub<->node traffic is IPv6-only. The JVM handles that without
+# help: those names resolve to exactly one address family, so address-sorting
+# preference never comes into it.
+#
+# Do NOT set -Djava.net.preferIPv6Addresses=true here. It fixes nothing on
+# Railway and it breaks Firefox: geckodriver binds 127.0.0.1 only, the node
+# then dials ::1 for its own driver, and every session dies with
+# "Connection error (POST http://localhost:NNNN/session)" while Chromium --
+# whose driver binds both families -- keeps working. Measured on live deploys
+# 2026-08-08: with the flag, 0 of 2 Firefox session attempts started.
 
 # ---------------------------------------------------------------------------
 # 3. Authentication
