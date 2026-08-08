@@ -1,0 +1,24 @@
+# Selenium Grid hub for Railway -- the public half of the multi-service grid
+# template. Nodes register with it over Railway's private network.
+FROM selenium/hub:4.46.0-20260707
+
+USER root
+
+# Basic auth on the router; the node images carry the same credentials in their
+# grid URL. See railway-entrypoint.sh for why an open router is not shipped.
+ENV SE_ROUTER_USERNAME=selenium
+
+# Railway's edge drops a request after ~5 minutes; keep Grid's own timeouts
+# inside that window so a stuck queue returns a Selenium error, not a 502.
+ENV SE_SESSION_REQUEST_TIMEOUT=300 \
+    SE_SESSION_RETRY_INTERVAL=5
+
+COPY railway-entrypoint.sh /usr/local/bin/railway-entrypoint.sh
+RUN chmod +x /usr/local/bin/railway-entrypoint.sh
+
+USER 1200
+
+ENV SE_RAILWAY_ROLE=hub
+EXPOSE 4442 4443 4444
+
+ENTRYPOINT ["/usr/local/bin/railway-entrypoint.sh", "/opt/bin/entry_point.sh"]

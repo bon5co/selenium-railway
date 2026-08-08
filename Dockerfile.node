@@ -1,0 +1,37 @@
+# Selenium Grid browser node for Railway. Private service: it registers with
+# the hub over railway.internal and is never given a public domain.
+#
+#   docker build -f Dockerfile.node --build-arg BROWSER=chromium .
+ARG BROWSER=chromium
+FROM selenium/node-${BROWSER}:4.46.0-20260707
+
+ARG BROWSER=chromium
+
+USER root
+
+# Session capacity: see Dockerfile.standalone -- nproc reports the host, not
+# the cgroup, so the automatic value oversubscribes the plan.
+ENV SE_NODE_MAX_SESSIONS=2 \
+    SE_NODE_OVERRIDE_MAX_SESSIONS=true \
+    SE_NODE_SESSION_TIMEOUT=300
+
+# 64 MB of /dev/shm kills Chromium renderers mid-test and --shm-size is not a
+# knob a Railway deployer has.
+ENV SE_BROWSER_ARGS_DEV_SHM=--disable-dev-shm-usage
+
+# A node's registration port is its own, not Railway's injected $PORT: the hub
+# dials it back on the private network and there is no edge proxy in between.
+ENV SE_NODE_PORT=5555
+
+ENV SE_START_VNC=false \
+    SE_START_NO_VNC=false
+
+COPY railway-entrypoint.sh /usr/local/bin/railway-entrypoint.sh
+RUN chmod +x /usr/local/bin/railway-entrypoint.sh
+
+USER 1200
+
+ENV SE_RAILWAY_ROLE=node
+EXPOSE 5555
+
+ENTRYPOINT ["/usr/local/bin/railway-entrypoint.sh", "/opt/bin/entry_point.sh"]

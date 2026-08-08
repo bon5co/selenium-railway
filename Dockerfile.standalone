@@ -1,0 +1,64 @@
+# Selenium Standalone for Railway -- one container that is router, distributor
+# and browser node at once. Build once per browser:
+#
+#   docker build -f Dockerfile.standalone --build-arg BROWSER=chromium .
+#
+# Pinned to a dated Selenium 4.46.0 tag. The upstream :latest moves weekly and
+# carries a new major browser with it, so two deploys of an unpinned template a
+# week apart do not run the same browser and do not reproduce each other's bugs.
+ARG BROWSER=chromium
+FROM selenium/standalone-${BROWSER}:4.46.0-20260707
+
+# Re-declare after FROM: an ARG before the first FROM is out of scope after it.
+ARG BROWSER=chromium
+
+USER root
+
+# --- Authentication -------------------------------------------------------
+# Username is fixed so the deploy form stays empty; the password arrives as a
+# per-deploy ${{secret(32)}} from the template. The entrypoint refuses to boot
+# if it is missing -- see railway-entrypoint.sh.
+ENV SE_ROUTER_USERNAME=selenium
+
+# --- Capacity -------------------------------------------------------------
+# A container reports the HOST's core count, not its cgroup quota, so Selenium's
+# automatic session count (min(cpus, 8)) sizes itself for the metal and
+# oversubscribes the plan -- sessions then compete for RAM and Chrome dies with
+# a bare "session deleted because of page crash". Pin it low and let the
+# deployer raise it against a plan they actually chose.
+ENV SE_NODE_MAX_SESSIONS=2 \
+    SE_NODE_OVERRIDE_MAX_SESSIONS=true
+
+# --- Timeouts -------------------------------------------------------------
+# Railway's edge proxy drops a request after ~5 minutes. Keeping Grid's own
+# timeouts at 300s means a stuck session surfaces as a Selenium error the
+# client can read instead of a bare "Application failed to respond".
+ENV SE_NODE_SESSION_TIMEOUT=300 \
+    SE_SESSION_REQUEST_TIMEOUT=300 \
+    SE_SESSION_RETRY_INTERVAL=5
+
+# --- /dev/shm -------------------------------------------------------------
+# Chromium and Edge map their renderer heap into /dev/shm, and a container gets
+# 64 MB of it. Past a couple of tabs the renderer is killed mid-test and the
+# client sees a page crash with no other clue. Upstream's answer is
+# `docker run --shm-size=2g`, which a Railway deployer has no way to pass, so
+# the flag goes in the image instead. SE_BROWSER_ARGS_* is appended by
+# docker-selenium to every session's browser arguments.
+ENV SE_BROWSER_ARGS_DEV_SHM=--disable-dev-shm-usage
+
+# --- Graphical debugging --------------------------------------------------
+# VNC + noVNC cost ~150 MB of RSS and expose an unauthenticated framebuffer on
+# 7900. Off by default; the README says which two variables turn them on when
+# a deployer wants to watch a run.
+ENV SE_START_VNC=false \
+    SE_START_NO_VNC=false
+
+COPY railway-entrypoint.sh /usr/local/bin/railway-entrypoint.sh
+RUN chmod +x /usr/local/bin/railway-entrypoint.sh
+
+USER 1200
+
+ENV SE_RAILWAY_ROLE=standalone
+EXPOSE 4444
+
+ENTRYPOINT ["/usr/local/bin/railway-entrypoint.sh", "/opt/bin/entry_point.sh"]
