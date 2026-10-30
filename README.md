@@ -1,5 +1,21 @@
 # selenium-railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/selenium-grid-446-or-hub-chromium-and-fi?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+**Deploy on Railway:** [Selenium Grid template](https://railway.com/deploy/selenium-grid-446-or-hub-chromium-and-fi?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/selenium-standalone-chromium-or-password?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+**Deploy on Railway:** [Selenium Standalone Chromium template](https://railway.com/deploy/selenium-standalone-chromium-or-password?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/selenium-standalone-edge-or-password-pro?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+**Deploy on Railway:** [Selenium Standalone Edge template](https://railway.com/deploy/selenium-standalone-edge-or-password-pro?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/selenium-standalone-firefox-or-password-?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+**Deploy on Railway:** [Selenium Standalone Firefox template](https://railway.com/deploy/selenium-standalone-firefox-or-password-?referralCode=Z1xivh&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
 Railway-tuned [docker-selenium](https://github.com/SeleniumHQ/docker-selenium) images, pinned to
 Selenium **4.46.0** (`4.46.0-20260707`). Wrapper images for the Railway marketplace templates.
 
